@@ -42,7 +42,7 @@
 
 ## 📖 Overview
 
-**Charicall** is an open-source, full-stack charity donation platform that connects compassionate donors with verified humanitarian causes. Unlike generic fundraising platforms, Charicall is built around **cause categories** — giving donors full clarity on exactly what their money supports.
+**Charity-call** is an open-source, full-stack charity donation platform that connects compassionate donors with verified humanitarian causes. Unlike generic fundraising platforms, Charicall is built around **cause categories** — giving donors full clarity on exactly what their money supports.
 
 Every donation on Charicall is:
 - **Transparent** — tracked from submission to disbursement
