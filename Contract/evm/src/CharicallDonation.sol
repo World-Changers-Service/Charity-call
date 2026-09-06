@@ -8,6 +8,7 @@ contract CharicallDonation {
     struct Cause {
         uint256 targetAmount;
         uint256 raisedAmount;
+        uint256 withdrawnAmount;
         bool goalReachedEmitted;
     }
 
@@ -24,11 +25,24 @@ contract CharicallDonation {
     /// @param targetAmount The funding goal for the cause.
     event CauseClosed(uint256 indexed causeId, uint256 totalRaised, uint256 targetAmount);
 
+    /// @notice Emitted when funds raised for a cause are withdrawn by the owner.
+    /// @param causeId The cause the withdrawal is drawn against.
+    /// @param to The recipient of the funds.
+    /// @param amount The amount withdrawn in this call.
+    /// @param totalWithdrawn The cumulative amount withdrawn for this cause after this call.
+    event Withdrawal(uint256 indexed causeId, address indexed to, uint256 amount, uint256 totalWithdrawn);
+
+    /// @notice Emitted when contract ownership is transferred.
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
     error NotOwner();
     error ZeroTarget();
     error CauseAlreadyExists();
     error UnknownCause();
     error ZeroDonation();
+    error ZeroAddress();
+    error InsufficientCauseBalance();
+    error TransferFailed();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -62,8 +76,28 @@ contract CharicallDonation {
         }
     }
 
-    /// @notice Transfers contract balance to the owner (e.g. for off-chain disbursement workflows).
-    function withdraw(uint256 amount, address payable to) external onlyOwner {
-        to.transfer(amount);
+    /// @notice Withdraws funds raised for a specific cause (e.g. for off-chain disbursement workflows).
+    /// @dev Capped at that cause's undrawn balance (`raisedAmount - withdrawnAmount`) so withdrawals
+    ///      can always be attributed to, and audited against, the cause that raised them.
+    function withdraw(uint256 causeId, uint256 amount, address payable to) external onlyOwner {
+        if (to == address(0)) revert ZeroAddress();
+        Cause storage c = causes[causeId];
+        if (c.targetAmount == 0) revert UnknownCause();
+
+        uint256 available = c.raisedAmount - c.withdrawnAmount;
+        if (amount > available) revert InsufficientCauseBalance();
+
+        c.withdrawnAmount += amount;
+        emit Withdrawal(causeId, to, amount, c.withdrawnAmount);
+
+        (bool ok,) = to.call{value: amount}("");
+        if (!ok) revert TransferFailed();
+    }
+
+    /// @notice Transfers contract ownership to a new address.
+    function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert ZeroAddress();
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
     }
 }
