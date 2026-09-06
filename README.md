@@ -130,7 +130,7 @@ Charicall follows a **monorepo structure** with three major subsystems — a RES
 │                              └───────────────────────┘    │
 │                                                           │
 │   ┌────────────────────────────────────────────────────┐  │
-│   │  Smart Contract Layer (Solidity)  — planned        │  │
+│   │  Smart Contract Layer (Soroban / Stellar)          │  │
 │   │  Immutable on-chain donation record keeping        │  │
 │   └────────────────────────────────────────────────────┘  │
 └───────────────────────────────────────────────────────────┘
@@ -188,11 +188,15 @@ Charicall/
 │   ├── styles/
 │   └── package.json
 │
-└── Contract/                   # Solidity smart contracts — planned
-    ├── src/
-    │   └── CharicallDonation.sol
-    ├── test/
-    └── foundry.toml / hardhat.config.ts
+└── Contract/                   # Soroban (Stellar) smart contracts
+    └── Charicall/
+        ├── contracts/
+        │   └── charicall-donation/
+        │       ├── src/
+        │       │   ├── lib.rs   # CharicallDonation contract
+        │       │   └── test.rs
+        │       └── Cargo.toml
+        └── Cargo.toml           # workspace
 ```
 
 ---
@@ -222,12 +226,13 @@ Charicall/
 | [React Query](https://tanstack.com/query) | Server state and data fetching |
 | [Stripe / Paystack](https://stripe.com/) | Payment processing |
 
-### Smart Contracts _(planned)_
+### Smart Contracts
 | Technology | Purpose |
 |---|---|
-| [Solidity](https://soliditylang.org/) | On-chain donation record logic |
-| [Foundry](https://getfoundry.sh/) | Contract testing and deployment |
-| [Ethers.js](https://ethers.org/) | Frontend contract interaction |
+| [Soroban](https://soroban.stellar.org/) | Stellar's smart contract platform — on-chain donation record logic |
+| [Rust](https://www.rust-lang.org/) | Contract implementation language |
+| [Stellar CLI](https://developers.stellar.org/docs/tools/cli/stellar-cli) | Contract build, test, and deployment |
+| [stellar-sdk (JS)](https://github.com/stellar/js-stellar-sdk) | Frontend contract interaction |
 
 ---
 
@@ -694,10 +699,10 @@ Charicall takes security seriously. The following measures are implemented or pl
 - [ ] Admin panel
 - [ ] Progressive Web App (PWA) support
 
-### Phase 4 — On-Chain Transparency _(planned)_
-- [ ] Solidity smart contract for immutable donation records
-- [ ] Contract deployment on Ethereum / Base / Polygon
-- [ ] Frontend wallet connection (MetaMask, WalletConnect)
+### Phase 4 — On-Chain Transparency
+- [x] Soroban smart contract for immutable donation records
+- [ ] Contract deployment on Stellar (testnet / mainnet)
+- [ ] Frontend wallet connection (Freighter, WalletConnect)
 - [ ] On-chain donation verification badges
 
 ### Phase 5 — Scale & Growth
